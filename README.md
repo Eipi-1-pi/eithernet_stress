@@ -49,5 +49,3 @@ Feel free to open issues or submit pull requests for improvements and bug fixes.
 
 This project is licensed under the MIT License.
 ```
-
-You can copy and paste this content into your `README.md` file.
