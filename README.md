@@ -13,7 +13,7 @@ This repository contains scripts for network stress testing, specifically for Et
 
 To run the `wifi_stress.py` script, you need the following Python package:
 - `aiohttp`
-
+```
 Install the required package using:
 ```sh
 pip install -r requirements.txt
