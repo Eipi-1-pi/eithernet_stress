@@ -1,10 +1,4 @@
 ```markdown
-# eithernet_stress
-```
-
-It looks like the current `README.md` file is quite minimal. You can expand it with the following enhanced content:
-
-```markdown
 # Ethernet Stress
 
 This repository contains scripts for network stress testing, specifically for Ethernet and WiFi connections.
