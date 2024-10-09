@@ -34,7 +34,7 @@ If you are unable to run the Python script directly, you can use the precompiled
 - `wifi_stress.zip`: Contains the compiled executable and necessary files.
 - `wifi_stress.exe`: Direct executable for Windows.
 
-Download and extract `wifi_stress.zip`, or run the standalone `wifi_stress.exe` on Windows.
+Download and extract `wifi_stress.zip` to run the standalone `wifi_stress.exe` on Windows.
 
 ### Notes
 
